@@ -1,7 +1,7 @@
-import os
 import re
 import csv
-from flask import Flask, request, send_file, render_template_string
+import os
+from flask import Flask, request, send_file, render_template
 from werkzeug.utils import secure_filename
 import tempfile
 from datetime import datetime
@@ -86,101 +86,18 @@ def sql_to_csv(sql_content):
 
 app = Flask(__name__)
 
-# HTML 模板
-HTML_TEMPLATE = '''
-<!DOCTYPE html>
-<html>
-<head>
-    <title>SQL to CSV Converter</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-            text-align: center;
-        }
-        .upload-form {
-            text-align: center;
-            margin: 20px 0;
-        }
-        .file-input {
-            margin: 10px 0;
-        }
-        .submit-btn {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .submit-btn:hover {
-            background-color: #45a049;
-        }
-        .message {
-            margin: 10px 0;
-            padding: 10px;
-            border-radius: 4px;
-        }
-        .error {
-            background-color: #ffebee;
-            color: #c62828;
-        }
-        .success {
-            background-color: #e8f5e9;
-            color: #2e7d32;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>SQL to CSV Converter</h1>
-        <div class="upload-form">
-            <form method="post" enctype="multipart/form-data">
-                <div class="file-input">
-                    <input type="file" name="sql_file" accept=".sql">
-                </div>
-                <button type="submit" class="submit-btn">Convert to CSV</button>
-            </form>
-        </div>
-        {% if error %}
-        <div class="message error">
-            {{ error }}
-        </div>
-        {% endif %}
-        {% if success %}
-        <div class="message success">
-            {{ success }}
-        </div>
-        {% endif %}
-    </div>
-</body>
-</html>
-'''
-
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
     if request.method == 'POST':
         if 'sql_file' not in request.files:
-            return render_template_string(HTML_TEMPLATE, error='No file uploaded')
+            return render_template('index.html', error='No file uploaded')
         
         file = request.files['sql_file']
         if file.filename == '':
-            return render_template_string(HTML_TEMPLATE, error='No file selected')
+            return render_template('index.html', error='No file selected')
         
         if not file.filename.endswith('.sql'):
-            return render_template_string(HTML_TEMPLATE, error='Please upload a .sql file')
+            return render_template('index.html', error='Please upload a .sql file')
         
         try:
             # 读取上传的SQL文件内容
@@ -203,7 +120,7 @@ def upload_file():
             )
             
         except Exception as e:
-            return render_template_string(HTML_TEMPLATE, error=f'Error during conversion: {str(e)}')
+            return render_template('index.html', error=f'Error during conversion: {str(e)}')
         
         finally:
             # 确保临时文件被删除
@@ -213,7 +130,7 @@ def upload_file():
                 except:
                     pass
     
-    return render_template_string(HTML_TEMPLATE)
+    return render_template('index.html')
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
