@@ -30,6 +30,10 @@ This project provides a simple tool to convert SQL query results to CSV format u
     ```
 2. Access the application in your web browser at `http://127.0.0.1:5000`.
 
+## DEMO
+
+https://sql2csv.vercel.app/
+
 ## License
 
 This project is licensed under the MIT License.
